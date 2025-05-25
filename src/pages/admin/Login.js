@@ -8,15 +8,9 @@ import {
   Button,
 } from "@mui/material";
 import { useNavigate, Navigate } from "react-router-dom";
+import LogoSP from '../../img/logo-spfc.png';
 import { useAuth } from "../../contexts/AuthContext";
 
-/**
- * Tela de Login administrativa
- * --------------------------------------------------
- * – Campos necessários pelo backend: usu_email & usu_senha
- * – Usa AuthContext para fazer login e armazenar o token
- * – Redireciona para /admin após sucesso
- */
 export default function Login() {
   const {
     register,
@@ -49,6 +43,16 @@ export default function Login() {
       }}
     >
       <Paper elevation={4} sx={{ p: 4, width: 360 }}>
+        <Box
+          component="img"
+          src={LogoSP}
+          alt="SPFC"
+          align="center"
+          sx={{
+            height: '80px',
+      
+          }}
+        />
         <Typography variant="h5" align="center" gutterBottom>
           Login administrativo
         </Typography>

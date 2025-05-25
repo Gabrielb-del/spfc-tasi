@@ -8,17 +8,35 @@ import LogoSP from '../../img/logo-spfc.png';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; // ajuste o caminho se necessário
+import { useAuth } from '../../contexts/AuthContext';
 
 const NavBar = () => {
-    const { isAdmin } = useAuth(); // usa o contexto
+    const { isAdmin, logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+    };
 
     return (
         <AppBar position="static" elevation={1} sx={{ backgroundColor: '#fff', color: '#000', overflow: 'visible', zIndex: 10 }}>
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center', minHeight: '80px', position: 'relative', zIndex: 10 }}>
-                {/* ESQUERDA - Logo */}
                 <Box sx={{ position: 'relative', height: '60px' }}>
-                    <Link to="/" style={{ textDecoration: 'none' }}>
+                    {isAdmin ? (
+                        <>
+                            <Box
+                                component="img"
+                                src={LogoSP}
+                                alt="SPFC"
+                                sx={{
+                                    height: '80px',
+                                    position: 'absolute',
+                                    bottom: '-20px',
+                                    left: 0,
+                                }}
+                            />
+                        </>
+
+                    ) : (<Link to="/" style={{ textDecoration: 'none' }}>
                         <Box
                             component="img"
                             src={LogoSP}
@@ -31,9 +49,10 @@ const NavBar = () => {
                             }}
                         />
                     </Link>
+                    )}
+
                 </Box>
 
-                {/* CENTRO - Botões dinâmicos */}
                 <Box display="flex" gap={2}>
                     {isAdmin ? (
                         <>
@@ -51,12 +70,10 @@ const NavBar = () => {
                         </>
                     )}
                 </Box>
-
-                {/* DIREITA - Login */}
                 <Box display="flex" alignItems="center" gap={1}>
                     {isAdmin ? (
                         <>
-                            <Button component={Link} to="/login" color="inherit">
+                            <Button onClick={handleLogout} component={Link} to="/login" color="inherit">
                                 Sair <LogoutIcon />
                             </Button>
                         </>

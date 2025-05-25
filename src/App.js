@@ -10,6 +10,7 @@ import Moletom from './pages/Moletom';
 import CamisaPolo from './pages/CamisaPolo';
 import Login from './pages/admin/Login';
 import { AuthProvider } from './contexts/AuthContext';
+import CategoriasAdmin from './pages/admin/CategoriasAdmin';
 
 const App = () => {
 
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/moletom" element={<Moletom />} />
           <Route path="/camisapolo" element={<CamisaPolo />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin/categorias" element={<CategoriasAdmin />} />
         </Routes>
       </Router>
     </AuthProvider>
