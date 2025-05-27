@@ -11,7 +11,7 @@ const CarouselBanner = () => {
     return (
         <Box
             sx={{
-                marginTop: '1px', // depende da altura da sua NavBar
+                marginTop: '1px',
                 position: 'relative',
                 zIndex: 1, 
             }}

@@ -9,6 +9,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
+
 
 const NavBar = () => {
     const { isAdmin, logout } = useAuth();
@@ -62,6 +64,7 @@ const NavBar = () => {
                         </>
                     ) : (
                         <>
+                            <Button component={Link} to="/" color="inherit">Home</Button>
                             <Button component={Link} to="/camisetas" color="inherit">Camisetas</Button>
                             <Button component={Link} to="/blusas" color="inherit">Blusas</Button>
                             <Button component={Link} to="/calcas" color="inherit">Calças</Button>
@@ -73,14 +76,21 @@ const NavBar = () => {
                 <Box display="flex" alignItems="center" gap={1}>
                     {isAdmin ? (
                         <>
-                            <Button onClick={handleLogout} component={Link} to="/login" color="inherit">
+                            <Button onClick={handleLogout} component={Link} to="/" color="inherit">
                                 Sair <LogoutIcon />
                             </Button>
                         </>
 
-                    ) : (<Button component={Link} to="/login" color="inherit">
-                        Login Admin <PersonIcon />
-                    </Button>
+                    ) : (
+                        <>
+                            <Button component={Link} to="/login" color="inherit">
+                                <LocalGroceryStoreIcon />
+                            </Button>
+
+                            <Button component={Link} to="/login" color="inherit">
+                                Login Admin <PersonIcon />
+                            </Button>
+                        </>
                     )}
 
                 </Box>

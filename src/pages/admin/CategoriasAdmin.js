@@ -1,103 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
 import {
-  Box, Button, TextField, Typography, Table, TableHead,
-  TableRow, TableCell, TableBody, Paper
-} from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
-
-const urlBase = 'https://backend-completo.vercel.app/app/categorias';
+    Box,
+    Button,
+    IconButton,
+    TextField,
+    Typography,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Paper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Alert,
+    CircularProgress,
+} from "@mui/material";
+import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+    getCategorias,
+    createCategoria,
+    updateCategoria,
+    deleteCategoria,
+} from "../../api/apiCategorias";
 
 export default function CategoriasAdmin() {
-  const { token } = useAuth();
+    const { token } = useAuth();
 
-  const [categorias, setCategorias] = useState([]);
-  const [nome, setNome] = useState('');
-  const [editId, setEditId] = useState(null);
+    const [categorias, setCategorias] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-  const headers = { Authorization: `Bearer ${token}` };
+    // Modal control
+    const [modalOpen, setModalOpen] = useState(false);
+    const [formNome, setFormNome] = useState("");
+    const [editId, setEditId] = useState(null);
 
-  const fetchCategorias = async () => {
-    try {
-      const { data } = await axios.get(urlBase, { headers });
-      setCategorias(data);
-    } catch (err) {
-      console.error('Erro ao buscar categorias:', err.response?.data || err.message);
-    }
-  };
+    // Load categorias
+    const loadCategorias = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const data = await getCategorias(token);
+            setCategorias(data);
+        } catch (err) {
+            setError("Erro ao carregar categorias");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const salvar = async () => {
-    if (!nome.trim()) return;
+    useEffect(() => {
+        if (token) loadCategorias();
+    }, [token]);
 
-    try {
-      if (editId) {
-        await axios.put(`${urlBase}/${editId}`, { cat_nome: nome }, { headers });
-      } else {
-        await axios.post(urlBase, { cat_nome: nome }, { headers });
-      }
-      setNome('');
-      setEditId(null);
-      fetchCategorias();
-    } catch (err) {
-      console.error('Erro ao salvar categoria:', err.response?.data || err.message);
-    }
-  };
+    // Modal handlers
+    const openCreateModal = () => {
+        setEditId(null);
+        setFormNome("");
+        setModalOpen(true);
+    };
 
-  const deletar = async (id) => {
-    if (!window.confirm('Excluir categoria?')) return;
-    try {
-      await axios.delete(`${urlBase}/${id}`, { headers });
-      fetchCategorias();
-    } catch (err) {
-      console.error('Erro ao deletar categoria:', err.response?.data || err.message);
-    }
-  };
+    const openEditModal = (cat) => {
+        setEditId(cat._id);
+        setFormNome(cat.nome);
+        setModalOpen(true);
+    };
 
-  useEffect(() => {
-    if (token) fetchCategorias();
-  }, [token]);
+    const closeModal = () => {
+        setModalOpen(false);
+        setFormNome("");
+        setEditId(null);
+    };
 
-  return (
-    <Box p={4} component={Paper} elevation={3}>
-      <Typography variant="h5" gutterBottom>Gerenciar Categorias</Typography>
+    // Save categoria
+    const saveCategoria = async () => {
+        if (!formNome.trim()) {
+            setError("Nome é obrigatório");
+            return;
+        }
+        setError("");
+        try {
+            if (editId) {
+                await updateCategoria(token, editId, formNome);
+            } else {
+                await createCategoria(token, formNome);
+            }
+            closeModal();
+            await loadCategorias();
+        } catch (err) {
+            setError("Erro ao salvar categoria");
+            console.error(err);
+        }
+    };
 
-      <Box display="flex" gap={2} mb={3}>
-        <TextField
-          fullWidth
-          label="Nome da categoria"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-        />
-        <Button variant="contained" onClick={salvar}>
-          {editId ? 'Atualizar' : 'Criar'}
-        </Button>
-      </Box>
+    // Delete categoria
+    const handleDelete = async (id) => {
+        if (!window.confirm("Confirma exclusão da categoria?")) return;
+        setError("");
+        try {
+            await deleteCategoria(token, id);
+            await loadCategorias();
+        } catch (err) {
+            setError("Erro ao excluir categoria");
+            console.error(err);
+        }
+    };
 
-      <Table component={Paper}>
-        <TableHead>
-          <TableRow>
-            <TableCell><strong>ID</strong></TableCell>
-            <TableCell><strong>Nome</strong></TableCell>
-            <TableCell><strong>Ações</strong></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {categorias.map((cat) => (
-            <TableRow key={cat.id}>
-              <TableCell>{cat.id}</TableCell>
-              <TableCell>{cat.cat_nome}</TableCell>
-              <TableCell>
-                <Button size="small" onClick={() => { setNome(cat.cat_nome); setEditId(cat.id); }}>
-                  Editar
+    return (
+        <Box p={4} component={Paper} elevation={3}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h5">Categorias</Typography>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateModal}>
+                    Nova categoria
                 </Button>
-                <Button size="small" color="error" onClick={() => deletar(cat.id)}>
-                  Excluir
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Box>
-  );
+            </Box>
+
+            {error && <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>{error}</Alert>}
+
+            {loading ? (
+                <Box display="flex" justifyContent="center" py={5}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>ID</TableCell>
+                            <TableCell>Nome</TableCell>
+                            <TableCell align="right">Ações</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {categorias.map((cat) => (
+                            <TableRow key={cat._id} hover>
+                                <TableCell>{cat._id}</TableCell>
+                                <TableCell>{cat.nome}</TableCell>
+                                <TableCell align="right">
+                                    <IconButton onClick={() => openEditModal(cat)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton color="error" onClick={() => handleDelete(cat._id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+
+            {/* Modal criar / editar */}
+            <Dialog open={modalOpen} onClose={closeModal} maxWidth="xs" fullWidth>
+                <DialogTitle>{editId ? "Editar categoria" : "Nova categoria"}</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        label="Nome da categoria"
+                        value={formNome}
+                        onChange={(e) => setFormNome(e.target.value)}
+                        margin="dense"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeModal}>Cancelar</Button>
+                    <Button variant="contained" onClick={saveCategoria}>
+                        {editId ? "Salvar" : "Criar"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
 }

@@ -11,6 +11,7 @@ import CamisaPolo from './pages/CamisaPolo';
 import Login from './pages/admin/Login';
 import { AuthProvider } from './contexts/AuthContext';
 import CategoriasAdmin from './pages/admin/CategoriasAdmin';
+import ProdutosAdmin from './pages/admin/ProdutosAdmin';
 
 const App = () => {
 
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/camisapolo" element={<CamisaPolo />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin/categorias" element={<CategoriasAdmin />} />
+          <Route path="/admin/produtos" element={<ProdutosAdmin/>} />
         </Routes>
       </Router>
     </AuthProvider>

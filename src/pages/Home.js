@@ -1,13 +1,60 @@
-import React from 'react';
-import { Container, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Container, Typography, Box, Grid } from '@mui/material';
 import CarouselBanner from '../components/CarouselBanner';
+import axios from 'axios';
+import ProductCard from '../components/ProductCard';
 
 const Home = () => {
+    const [produtos, setProdutos] = useState([]);
+
+    useEffect(() => {
+        const fetchProdutos = async () => {
+            try {
+                const userIdPublico = '010623023';
+
+                const res = await axios.get(`https://backend-completo.vercel.app/app/produtos/${userIdPublico}`);
+                    console.log('Produtos recebidos:', res.data);
+
+                setProdutos(res.data);
+            } catch (error) {
+                console.error('Erro ao buscar produtos:', error);
+            }
+        };
+
+        fetchProdutos();
+    }, []);
+
+    const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
+
+    const lancamentos = shuffle(produtos).slice(0, 5);
+    const maisVendidos = shuffle(produtos).slice(0, 5);
+    const recomendados = shuffle(produtos).slice(0, 5);
+
+    const renderSection = (title, items) => (
+    <Box my={4}>
+        <Typography variant="h5" fontWeight="bold" mb={2}>
+            {title}
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+            {items.map((produto) => (
+                <Grid item key={produto._id} xs={12} sm={6} md={4} lg={3}>
+                    <ProductCard produto={produto} />
+                </Grid>
+            ))}
+        </Grid>
+    </Box>
+);
+
     return (
-        <Container disableGutters maxWidth={false}>
-            <CarouselBanner />
-            <Typography>Teste</Typography>
+        <>
+        <CarouselBanner />
+        <Container disableGutters maxWidth={false} sx={{ px: 4 }}>
+            
+            {renderSection('Lançamentos', lancamentos)}
+            {renderSection('Mais Vendidos', maisVendidos)}
+            {renderSection('Recomendados', recomendados)}
         </Container>
+        </>
     );
 };
 
