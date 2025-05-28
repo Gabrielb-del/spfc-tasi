@@ -1,11 +1,15 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCarrinho } from '../contexts/CarrinhoContext';
-import { Container, Typography, Button, Box } from '@mui/material';
+import {
+    Container, Typography, Button, Box, TextField, IconButton
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const Carrinho = () => {
-    const { itens, removerDoCarrinho, limparCarrinho } = useCarrinho();
+export default function Carrinho() {
+    const navigate = useNavigate();
+    const { itens, removerDoCarrinho, alterarQuantidade, limparCarrinho } = useCarrinho();
 
-    const total = itens.reduce((acc, item) => acc + (item.preco || 0), 0);
+    const total = itens.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
 
     return (
         <Container sx={{ mt: 4 }}>
@@ -16,7 +20,7 @@ const Carrinho = () => {
             ) : (
                 <>
                     {itens.map((item) => (
-                        <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={4}>
+                        <Box key={item._id} display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={4}>
                             <Box
                                 component="img"
                                 src={item.imagem}
@@ -24,38 +28,50 @@ const Carrinho = () => {
                                 sx={{
                                     maxWidth: '15%',
                                     height: 'auto',
-                                    maxHeight: 500,
                                     objectFit: 'contain',
                                     borderRadius: 2,
                                     boxShadow: 3
                                 }}
                             />
-                            <Box key={item._id} sx={{ py: 2 }}>
-
+                            <Box sx={{ py: 2, flexGrow: 1 }}>
                                 <Typography variant="h6">{item.nome}</Typography>
                                 <Typography>R$ {item.preco.toFixed(2)}</Typography>
-                                <Button color="error" onClick={() => removerDoCarrinho(item._id)}>Remover</Button>
+
+                                <Box display="flex" alignItems="center" gap={1} mt={1}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => alterarQuantidade(item._id, -1)}
+                                        disabled={item.quantidade <= 1}
+                                    >-</Button>
+                                    <Typography>{item.quantidade}</Typography>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => alterarQuantidade(item._id, 1)}
+                                    >+</Button>
+                                </Box>
+
+                                <Button
+                                    color="error"
+                                    onClick={() => removerDoCarrinho(item._id)}
+                                    sx={{ mt: 1 }}
+                                >
+                                    Remover
+                                </Button>
                             </Box>
                         </Box>
                     ))}
 
-                    <Typography variant="h6" sx={{ mt: 2 }}>Total: R$ {total.toFixed(2)}</Typography>
+                    <Typography variant="h6" mt={2}>Total: R$ {total.toFixed(2)}</Typography>
 
-                    <Box sx={{ mt: 3 }}>
-                        <Button variant="contained" color="primary" sx={{
-                            backgroundColor: '#CC0000',
-                            color: '#fff',
-                            '&:hover': {
-                                backgroundColor: '#990000'
-                            }
-                        }} onClick={() => alert('Compra finalizada!')}>
+                    <Box mt={3} display="flex" gap={2}>
+                        <Button
+                            variant="contained"
+                            sx={{ backgroundColor: '#CC0000', '&:hover': { backgroundColor: '#990000' } }}
+                            onClick={() => navigate('/checkout')}
+                        >
                             Finalizar Compra
                         </Button>
-                        <Button variant="outlined" sx={{
-                            color: '#CC0000'
-                        
-                            
-                        }} onClick={limparCarrinho}>
+                        <Button variant="outlined" color="error" onClick={limparCarrinho}>
                             Limpar Carrinho
                         </Button>
                     </Box>
@@ -63,6 +79,4 @@ const Carrinho = () => {
             )}
         </Container>
     );
-};
-
-export default Carrinho;
+}
