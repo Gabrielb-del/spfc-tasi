@@ -34,12 +34,12 @@ export default function CategoriasAdmin() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Modal control
+
     const [modalOpen, setModalOpen] = useState(false);
     const [formNome, setFormNome] = useState("");
     const [editId, setEditId] = useState(null);
 
-    // Load categorias
+
     const loadCategorias = async () => {
         setLoading(true);
         setError("");
@@ -58,7 +58,7 @@ export default function CategoriasAdmin() {
         if (token) loadCategorias();
     }, [token]);
 
-    // Modal handlers
+
     const openCreateModal = () => {
         setEditId(null);
         setFormNome("");
@@ -77,7 +77,7 @@ export default function CategoriasAdmin() {
         setEditId(null);
     };
 
-    // Save categoria
+
     const saveCategoria = async () => {
         if (!formNome.trim()) {
             setError("Nome é obrigatório");
@@ -98,7 +98,7 @@ export default function CategoriasAdmin() {
         }
     };
 
-    // Delete categoria
+
     const handleDelete = async (id) => {
         if (!window.confirm("Confirma exclusão da categoria?")) return;
         setError("");
@@ -154,7 +154,7 @@ export default function CategoriasAdmin() {
                 </Table>
             )}
 
-            {/* Modal criar / editar */}
+
             <Dialog open={modalOpen} onClose={closeModal} maxWidth="xs" fullWidth>
                 <DialogTitle>{editId ? "Editar categoria" : "Nova categoria"}</DialogTitle>
                 <DialogContent>

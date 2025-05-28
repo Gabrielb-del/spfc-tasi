@@ -43,16 +43,18 @@ export default function Login() {
       }}
     >
       <Paper elevation={4} sx={{ p: 4, width: 360 }}>
-        <Box
-          component="img"
-          src={LogoSP}
-          alt="SPFC"
-          align="center"
-          sx={{
-            height: '80px',
-      
-          }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Box
+            component="img"
+            src={LogoSP}
+            alt="SPFC"
+            align="center"
+            sx={{
+              height: '80px',
+
+            }}
+          />
+        </Box>
         <Typography variant="h5" align="center" gutterBottom>
           Login administrativo
         </Typography>
@@ -77,7 +79,13 @@ export default function Login() {
             helperText={errors.senha?.message}
           />
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+          <Button type="submit" variant="contained" fullWidth sx={{
+            backgroundColor: '#CC0000', 
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#990000' 
+            }
+          }}>
             Entrar
           </Button>
         </form>
